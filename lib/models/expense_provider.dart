@@ -3,7 +3,7 @@ import 'package:uuid/uuid.dart';
 import 'expense_model.dart';
 
 class ExpenseProvider extends ChangeNotifier {
-  List<Expense> _expenses = [
+  final List<Expense> _expenses = [
     // Sample data
     Expense(
       id: '1',
