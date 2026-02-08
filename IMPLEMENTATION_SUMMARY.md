@@ -10,6 +10,15 @@ Your personal Expense Tracker application has been fully developed with an attra
 
 ### ✨ Features Implemented
 
+#### 0. **Authentication System** 🔐
+- Login screen with email/password authentication
+- Registration screen with form validation
+- Password visibility toggle
+- Terms of Service agreement checkbox
+- Auto-redirect after successful authentication
+- Error handling and display
+- AuthProvider for state management
+
 #### 1. **Home Screen** 📊
 - Interactive pie chart showing expense distribution across categories
 - Total expense summary card with monthly/yearly breakdown
@@ -60,17 +69,26 @@ Your personal Expense Tracker application has been fully developed with an attra
 
 ```
 lib/
-├── main.dart                      (102 lines)
-│   └─ App entry point & navigation
+├── main.dart                      (290+ lines)
+│   └─ App entry point, auth wrapper & navigation
 │
 ├── models/
 │   ├── expense_model.dart         (58 lines)
 │   │   └─ ExpenseCategory, Expense, ExpenseLimit, UserProfile
 │   │
-│   └── expense_provider.dart      (141 lines)
-│       └─ ExpenseProvider with state management
+│   ├── expense_provider.dart      (141 lines)
+│   │   └─ ExpenseProvider with state management
+│   │
+│   └── auth_provider.dart         (120 lines)
+│       └─ AuthProvider for authentication
 │
 └── screens/
+    ├── login_screen.dart          (320 lines)
+    │   └─ User login with email/password
+    │
+    ├── register_screen.dart       (420 lines)
+    │   └─ New user registration form
+    │
     ├── home_screen.dart           (545 lines)
     │   └─ Pie chart, recent expenses, quick-add
     │
@@ -80,7 +98,7 @@ lib/
     └── limit_setting_screen.dart  (360 lines)
         └─ Budget limits, alerts, recommendations
 
-Total: ~1,700 lines of production-ready code
+Total: ~2,400+ lines of production-ready code
 ```
 
 ---
@@ -152,11 +170,13 @@ flutter run
 ```
 
 ### First Run
-1. App launches on Home screen
-2. See pie chart with sample data
-3. Switch to Dashboard to view statistics
-4. Go to Limits to set your budget
-5. Tap (+) to add a new expense
+1. App launches on Login screen
+2. Sign in with any email/password or create a new account
+3. After authentication, Home screen appears
+4. See pie chart with sample data
+5. Switch to Dashboard to view statistics
+6. Go to Budget to set your limits
+7. Tap (+) to add a new expense
 
 ---
 

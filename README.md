@@ -4,6 +4,14 @@ A modern Flutter application designed to help you track and manage your personal
 
 ## Features
 
+### 🔐 Authentication
+- **Login Screen**: Secure sign-in with email and password
+- **Register Screen**: Create new account with name, email, and password
+- **Form Validation**: Real-time validation for all input fields
+- **Password Visibility Toggle**: Option to show/hide password
+- **Terms of Service**: Agreement checkbox before registration
+- **Auto-redirect**: Automatic navigation to main app after authentication
+
 ### 🏠 Home Screen
 - **Pie Chart Visualization**: Visual representation of your spending across different expense categories
 - **Total Expense Summary**: Quick overview of total, monthly, and yearly expenses
@@ -45,6 +53,11 @@ A modern Flutter application designed to help you track and manage your personal
 - **UserProfile**: User information and metadata
 
 ### State Management
+- **AuthProvider**: Handles authentication state
+  - Login/logout functionality
+  - User registration
+  - Authentication state tracking
+  - Error handling
 - **ExpenseProvider**: Central provider using Provider package for state management
   - Manage expenses list
   - Calculate totals and breakdowns
@@ -52,9 +65,11 @@ A modern Flutter application designed to help you track and manage your personal
   - Track user profile
 
 ### Screens
-1. **HomeScreen**: Main dashboard with pie chart and expense history
-2. **DashboardScreen**: Detailed user dashboard with statistics
-3. **LimitSettingScreen**: Configure budget limits and view alerts
+1. **LoginScreen**: User authentication with email/password
+2. **RegisterScreen**: New user registration with form validation
+3. **HomeScreen**: Main dashboard with pie chart and expense history
+4. **DashboardScreen**: Detailed user dashboard with statistics
+5. **LimitSettingScreen**: Configure budget limits and view alerts
 
 ## Getting Started
 
@@ -92,6 +107,17 @@ flutter run
 ```
 
 ## Usage
+
+### Authentication
+1. **Login**: Enter your email and password on the login screen, then tap "Sign In"
+2. **Register**: Tap "Sign Up" to create a new account
+   - Enter your full name, email, and password
+   - Confirm your password
+   - Agree to Terms of Service
+   - Tap "Create Account"
+3. **Logout**: Access from the Profile screen (coming soon)
+
+> **Note**: For demo purposes, any valid email/password combination will work for login.
 
 ### Adding an Expense
 1. Tap the floating action button (+) on the home screen
@@ -142,8 +168,10 @@ Currently, the app stores data in memory. For production use, consider implement
 - 📱 Multiple currency support
 - 🌙 Dark mode theme
 - 📤 Export expenses to CSV/PDF
-- 👥 Multi-user support
-- 🔐 Biometric authentication
+- � Biometric authentication
+- 📧 Email verification
+- 🔑 Password reset functionality
+- 🔗 Social login (Google, Apple)
 
 ## License
 

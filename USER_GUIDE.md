@@ -2,7 +2,39 @@
 
 ## App Overview
 
-Your Expense Tracker application is a beautiful, feature-rich expense management app with three main sections accessible via bottom navigation.
+Your Expense Tracker application is a beautiful, feature-rich expense management app with authentication and four main sections accessible via bottom navigation.
+
+---
+
+## 🔐 Getting Started - Authentication
+
+### Login Screen
+When you first open the app, you'll see the login screen.
+
+**To Sign In:**
+1. Enter your email address
+2. Enter your password
+3. Tap "Sign In"
+
+> **Note**: For demo purposes, any valid email/password combination will work.
+
+### Register Screen
+If you don't have an account, you can create one.
+
+**To Create an Account:**
+1. Tap "Sign Up" on the login screen
+2. Enter your full name
+3. Enter your email address
+4. Enter a password (minimum 6 characters)
+5. Confirm your password
+6. Check the box to agree to Terms of Service
+7. Tap "Create Account"
+
+**Features:**
+- Password visibility toggle (eye icon)
+- Real-time form validation
+- Error messages for invalid inputs
+- Auto-login after successful registration
 
 ---
 
@@ -213,6 +245,7 @@ A: Currently, all data is lost. Future versions will include backup features.
 ## 🚀 Getting Started Checklist
 
 - [ ] Download and install the app
+- [ ] Create an account or login
 - [ ] Open app and go to Dashboard
 - [ ] Update your profile (name & email)
 - [ ] Go to Limits and set monthly budget

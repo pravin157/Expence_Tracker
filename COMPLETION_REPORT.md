@@ -9,6 +9,9 @@ Your personal Expense Tracker application has been fully developed, tested, and 
 ## 📋 DELIVERABLES CHECKLIST
 
 ### ✅ Core Application Features
+- [x] **Login Screen** with email/password authentication
+- [x] **Registration Screen** with form validation and terms agreement
+- [x] **Authentication State** managed with AuthProvider
 - [x] **Home Screen** with interactive pie chart showing expense distribution
 - [x] **Expense History** displayed below pie chart in recent expenses list
 - [x] **Monthly Budget Limits** with tracking and alerts
@@ -18,7 +21,7 @@ Your personal Expense Tracker application has been fully developed, tested, and 
 - [x] **Expense Categories** (8 different types with emojis)
 - [x] **Quick Add Expense** functionality via floating button
 - [x] **Profile Management** with name and email editing
-- [x] **Navigation System** with 3 main tabs
+- [x] **Navigation System** with 4 main tabs
 
 ### ✅ User Interface
 - [x] Attractive, modern design with Material Design 3
