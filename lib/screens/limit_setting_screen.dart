@@ -55,17 +55,23 @@ class _LimitSettingScreenState extends State<LimitSettingScreen> {
                   _monthlyController,
                   expenseProvider.monthlyExpenses,
                   expenseProvider.monthlyLimit?.limitAmount,
-                  () {
+                  () async {
                     if (_monthlyController.text.isNotEmpty) {
-                      expenseProvider.setMonthlyLimit(
+                      final success = await expenseProvider.setMonthlyLimit(
                         double.parse(_monthlyController.text),
                       );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Monthly limit updated successfully'),
-                          duration: Duration(seconds: 2),
-                        ),
-                      );
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              success
+                                  ? 'Monthly limit updated successfully'
+                                  : 'Failed to update monthly limit',
+                            ),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      }
                     }
                   },
                   'Set a budget limit for your monthly expenses',
@@ -80,17 +86,23 @@ class _LimitSettingScreenState extends State<LimitSettingScreen> {
                   _yearlyController,
                   expenseProvider.yearlyExpenses,
                   expenseProvider.yearlyLimit?.limitAmount,
-                  () {
+                  () async {
                     if (_yearlyController.text.isNotEmpty) {
-                      expenseProvider.setYearlyLimit(
+                      final success = await expenseProvider.setYearlyLimit(
                         double.parse(_yearlyController.text),
                       );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Yearly limit updated successfully'),
-                          duration: Duration(seconds: 2),
-                        ),
-                      );
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              success
+                                  ? 'Yearly limit updated successfully'
+                                  : 'Failed to update yearly limit',
+                            ),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      }
                     }
                   },
                   'Set a budget limit for your yearly expenses',
@@ -120,12 +132,16 @@ class _LimitSettingScreenState extends State<LimitSettingScreen> {
     TextEditingController controller,
     double currentSpent,
     double? limit,
-    VoidCallback onSave,
+    Future<void> Function() onSave,
     String description,
   ) {
     final hasLimit = limit != null;
-    final remaining = hasLimit ? (limit - currentSpent).clamp(0, double.infinity) : 0.0;
-    final percentage = hasLimit ? (currentSpent / limit * 100).clamp(0, 100) : 0.0;
+    final remaining = hasLimit
+        ? (limit - currentSpent).clamp(0, double.infinity)
+        : 0.0;
+    final percentage = hasLimit
+        ? (currentSpent / limit * 100).clamp(0, 100)
+        : 0.0;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -155,14 +171,14 @@ class _LimitSettingScreenState extends State<LimitSettingScreen> {
                     Text(
                       title,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     Text(
                       description,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.grey,
-                          ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: Colors.grey),
                     ),
                   ],
                 ),
@@ -213,15 +229,15 @@ class _LimitSettingScreenState extends State<LimitSettingScreen> {
                     children: [
                       Text(
                         'Spent',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.grey,
-                            ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodySmall?.copyWith(color: Colors.grey),
                       ),
                       Text(
                         '\$${currentSpent.toStringAsFixed(2)} / \$${limit.toStringAsFixed(2)}',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
@@ -243,9 +259,9 @@ class _LimitSettingScreenState extends State<LimitSettingScreen> {
                         ? 'Over limit by \$${(currentSpent - limit).toStringAsFixed(2)}'
                         : 'Remaining: \$${remaining.toStringAsFixed(2)}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: percentage > 100 ? Colors.red : Colors.green,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      color: percentage > 100 ? Colors.red : Colors.green,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),
@@ -275,9 +291,9 @@ class _LimitSettingScreenState extends State<LimitSettingScreen> {
       children: [
         Text(
           'Budget Recommendations',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 12),
         _buildRecommendationCard(
@@ -327,15 +343,15 @@ class _LimitSettingScreenState extends State<LimitSettingScreen> {
               children: [
                 Text(
                   title,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 Text(
                   description,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: Colors.grey),
                 ),
               ],
             ),
@@ -345,19 +361,16 @@ class _LimitSettingScreenState extends State<LimitSettingScreen> {
     );
   }
 
-  Widget _buildAlertsSection(
-    BuildContext context,
-    ExpenseProvider provider,
-  ) {
+  Widget _buildAlertsSection(BuildContext context, ExpenseProvider provider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Budget Alerts',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Colors.red,
-              ),
+            fontWeight: FontWeight.bold,
+            color: Colors.red,
+          ),
         ),
         const SizedBox(height: 12),
         if (provider.isMonthlyLimitExceeded())
@@ -403,15 +416,15 @@ class _LimitSettingScreenState extends State<LimitSettingScreen> {
                 Text(
                   title,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
-                      ),
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
+                  ),
                 ),
                 Text(
                   message,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.red.shade700,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: Colors.red.shade700),
                 ),
               ],
             ),

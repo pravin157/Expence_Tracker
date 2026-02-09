@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import '../models/auth_provider.dart';
 import '../models/expense_provider.dart';
 import '../models/expense_model.dart';
 
@@ -28,9 +29,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-      body: Consumer<ExpenseProvider>(
-        builder: (context, expenseProvider, child) {
-          final profile = expenseProvider.userProfile;
+      body: Consumer2<ExpenseProvider, AuthProvider>(
+        builder: (context, expenseProvider, authProvider, child) {
+          final profile = authProvider.currentUser;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
@@ -44,9 +45,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 // Statistics Overview
                 Text(
                   'Statistics Overview',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
                 _buildStatisticsGrid(context, expenseProvider),
@@ -55,9 +56,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 // Budget Status
                 Text(
                   'Budget Status',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
                 _buildBudgetStatus(context, expenseProvider),
@@ -66,9 +67,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 // Top Spending Categories
                 Text(
                   'Top Spending Categories',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
                 _buildTopCategories(context, expenseProvider),
@@ -77,9 +78,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 // Recent Transactions
                 Text(
                   'Recent Transactions',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
                 _buildRecentTransactions(context, expenseProvider),
@@ -119,18 +120,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 decoration: BoxDecoration(
                   color: const Color(0xFFEAEFEF),
                   borderRadius: BorderRadius.circular(40),
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 2,
-                  ),
+                  border: Border.all(color: Colors.white, width: 2),
                 ),
                 child: Center(
                   child: Text(
                     (profile?.name ?? 'U').substring(0, 1).toUpperCase(),
                     style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -142,16 +140,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Text(
                       profile?.name ?? 'User',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       profile?.email ?? 'user@example.com',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.white70,
-                          ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: Colors.white70),
                     ),
                     const SizedBox(height: 8),
                     Container(
@@ -165,9 +163,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       child: Text(
                         'Member since ${DateFormat('MMM yyyy').format(profile?.joinDate ?? DateTime.now())}',
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: Colors.white70,
-                            ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelSmall?.copyWith(color: Colors.white70),
                       ),
                     ),
                   ],
@@ -244,17 +242,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(height: 12),
           Text(
             label,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.grey,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: Colors.grey),
           ),
           const SizedBox(height: 4),
           Text(
             value,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
           ),
         ],
       ),
@@ -301,16 +299,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Text(
                     'No budgets set yet',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.amber.shade700,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      color: Colors.amber.shade700,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Set your monthly or yearly budget limits',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.amber.shade600,
-                        ),
+                      color: Colors.amber.shade600,
+                    ),
                   ),
                 ],
               ),
@@ -345,9 +343,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               Text(
                 label,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -358,9 +356,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Text(
                   '${percentage.toStringAsFixed(0)}%',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: isExceeded ? Colors.red : Colors.green,
-                      ),
+                    fontWeight: FontWeight.bold,
+                    color: isExceeded ? Colors.red : Colors.green,
+                  ),
                 ),
               ),
             ],
@@ -383,18 +381,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               Text(
                 '\$${spent.toStringAsFixed(2)} / \$${limit.toStringAsFixed(2)}',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: Colors.grey),
               ),
               Text(
                 isExceeded
                     ? 'Over by \$${(spent - limit).toStringAsFixed(2)}'
                     : 'Remaining: \$${remaining.toStringAsFixed(2)}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w500,
-                      color: isExceeded ? Colors.red : Colors.green,
-                    ),
+                  fontWeight: FontWeight.w500,
+                  color: isExceeded ? Colors.red : Colors.green,
+                ),
               ),
             ],
           ),
@@ -407,10 +405,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     BuildContext context,
     ExpenseProvider expenseProvider,
   ) {
-    final categories = expenseProvider.expensesByCategory.entries
-        .where((e) => e.value > 0)
-        .toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
+    final categories =
+        expenseProvider.expensesByCategory.entries
+            .where((e) => e.value > 0)
+            .toList()
+          ..sort((a, b) => b.value.compareTo(a.value));
 
     if (categories.isEmpty) {
       return Center(
@@ -418,9 +417,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           padding: const EdgeInsets.all(32.0),
           child: Text(
             'No expenses yet',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
           ),
         ),
       );
@@ -467,8 +466,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       Text(
                         category.label,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       ClipRRect(
@@ -492,14 +491,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Text(
                       '\$${amount.toStringAsFixed(2)}',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     Text(
                       '${percentage.toStringAsFixed(1)}%',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.grey,
-                          ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: Colors.grey),
                     ),
                   ],
                 ),
@@ -523,9 +522,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           padding: const EdgeInsets.all(32.0),
           child: Text(
             'No transactions yet',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
           ),
         ),
       );
@@ -567,14 +566,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       Text(
                         expense.title,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       Text(
                         DateFormat('MMM d, yyyy').format(expense.date),
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.grey,
-                            ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodySmall?.copyWith(color: Colors.grey),
                       ),
                     ],
                   ),
@@ -585,9 +584,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Text(
                       '-\$${expense.amount.toStringAsFixed(2)}',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.red,
-                          ),
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
                     ),
                   ],
                 ),
@@ -600,8 +599,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _showEditProfileDialog(BuildContext context) {
-    final provider = context.read<ExpenseProvider>();
-    final profile = provider.userProfile;
+    final authProvider = context.read<AuthProvider>();
+    final profile = authProvider.currentUser;
     final nameController = TextEditingController(text: profile?.name);
     final emailController = TextEditingController(text: profile?.email);
 
@@ -639,18 +638,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
-              provider.updateUserProfile(
+            onPressed: () async {
+              final success = await authProvider.updateProfile(
                 name: nameController.text,
                 email: emailController.text,
               );
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Profile updated successfully'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
+              if (context.mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success
+                          ? 'Profile updated successfully'
+                          : 'Failed to update profile',
+                    ),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              }
             },
             child: const Text('Save'),
           ),

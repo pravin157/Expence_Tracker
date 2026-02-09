@@ -1,19 +1,46 @@
 import 'package:flutter/foundation.dart';
+import '../services/api_service.dart';
 import 'expense_model.dart';
 
 class AuthProvider extends ChangeNotifier {
+  final ApiService _apiService = ApiService();
+
   bool _isAuthenticated = false;
   bool _isLoading = false;
+  bool _isInitialized = false;
   String? _errorMessage;
   UserProfile? _currentUser;
 
-  // Simulated user database
-  final Map<String, Map<String, String>> _users = {};
-
   bool get isAuthenticated => _isAuthenticated;
   bool get isLoading => _isLoading;
+  bool get isInitialized => _isInitialized;
   String? get errorMessage => _errorMessage;
   UserProfile? get currentUser => _currentUser;
+
+  AuthProvider() {
+    _initialize();
+  }
+
+  /// Initialize auth state by checking for saved token
+  Future<void> _initialize() async {
+    try {
+      await _apiService.loadToken();
+      if (_apiService.isAuthenticated) {
+        // Try to fetch profile to validate token
+        final profileData = await _apiService.getProfile();
+        _currentUser = UserProfile.fromJson(profileData);
+        _isAuthenticated = true;
+      }
+    } catch (e) {
+      // Token is invalid or expired
+      await _apiService.clearToken();
+      _isAuthenticated = false;
+      _currentUser = null;
+    } finally {
+      _isInitialized = true;
+      notifyListeners();
+    }
+  }
 
   void clearError() {
     _errorMessage = null;
@@ -25,38 +52,35 @@ class AuthProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 1500));
-
-    // Check if user exists
-    if (_users.containsKey(email)) {
-      if (_users[email]!['password'] == password) {
-        _currentUser = UserProfile(
-          name: _users[email]!['name']!,
-          email: email,
-          joinDate: DateTime.now(),
-        );
-        _isAuthenticated = true;
-        _isLoading = false;
-        notifyListeners();
-        return true;
-      } else {
-        _errorMessage = 'Incorrect password';
-        _isLoading = false;
-        notifyListeners();
-        return false;
-      }
-    } else {
-      // For demo purposes, allow login with any credentials
-      _currentUser = UserProfile(
-        name: email.split('@').first,
+    try {
+      final response = await _apiService.login(
         email: email,
-        joinDate: DateTime.now(),
+        password: password,
       );
+
+      if (response['user'] != null) {
+        _currentUser = UserProfile.fromJson(response['user']);
+      } else {
+        // Fetch profile separately if not in response
+        final profileData = await _apiService.getProfile();
+        _currentUser = UserProfile.fromJson(profileData);
+      }
+
       _isAuthenticated = true;
       _isLoading = false;
       notifyListeners();
       return true;
+    } on ApiException catch (e) {
+      _errorMessage = e.message;
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _errorMessage =
+          'Connection error. Please check your internet connection.';
+      _isLoading = false;
+      notifyListeners();
+      return false;
     }
   }
 
@@ -65,18 +89,7 @@ class AuthProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 1500));
-
-    // Check if email already exists
-    if (_users.containsKey(email)) {
-      _errorMessage = 'An account with this email already exists';
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    }
-
-    // Validate inputs
+    // Client-side validation
     if (name.trim().isEmpty) {
       _errorMessage = 'Please enter your name';
       _isLoading = false;
@@ -98,29 +111,122 @@ class AuthProvider extends ChangeNotifier {
       return false;
     }
 
-    // Register user
-    _users[email] = {
-      'name': name,
-      'password': password,
-    };
+    try {
+      final response = await _apiService.register(
+        name: name,
+        email: email,
+        password: password,
+      );
 
-    // Auto-login after registration
-    _currentUser = UserProfile(
-      name: name,
-      email: email,
-      joinDate: DateTime.now(),
-    );
-    _isAuthenticated = true;
-    _isLoading = false;
-    notifyListeners();
-    return true;
+      if (response['user'] != null) {
+        _currentUser = UserProfile.fromJson(response['user']);
+      } else {
+        _currentUser = UserProfile(
+          name: name,
+          email: email,
+          joinDate: DateTime.now(),
+        );
+      }
+
+      _isAuthenticated = true;
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } on ApiException catch (e) {
+      _errorMessage = e.message;
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _errorMessage =
+          'Connection error. Please check your internet connection.';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
   }
 
-  void logout() {
+  Future<void> logout() async {
+    await _apiService.clearToken();
     _isAuthenticated = false;
     _currentUser = null;
     _errorMessage = null;
     notifyListeners();
+  }
+
+  Future<bool> updateProfile({String? name, String? email}) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await _apiService.updateProfile(
+        name: name,
+        email: email,
+      );
+
+      _currentUser = UserProfile.fromJson(response);
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } on ApiException catch (e) {
+      _errorMessage = e.message;
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _errorMessage = 'Failed to update profile';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    if (newPassword.length < 6) {
+      _errorMessage = 'New password must be at least 6 characters';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+
+    try {
+      await _apiService.changePassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      );
+
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } on ApiException catch (e) {
+      _errorMessage = e.message;
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _errorMessage = 'Failed to change password';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<void> refreshProfile() async {
+    try {
+      final profileData = await _apiService.getProfile();
+      _currentUser = UserProfile.fromJson(profileData);
+      notifyListeners();
+    } catch (e) {
+      // Handle silently or log error
+    }
   }
 
   bool _isValidEmail(String email) {

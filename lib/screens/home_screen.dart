@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import '../models/auth_provider.dart';
 import '../models/expense_provider.dart';
 import '../models/expense_model.dart';
 
@@ -39,8 +40,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text(
                     'Expense Distribution',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   _buildPieChart(expensesByCategory, context),
@@ -53,8 +54,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         'Recent Expenses',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       TextButton(
                         onPressed: () {
@@ -82,6 +83,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildHeader(BuildContext context, ExpenseProvider expenseProvider) {
+    final authProvider = context.watch<AuthProvider>();
+    final profile = authProvider.currentUser;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -90,15 +93,15 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Text(
               'Welcome back!',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.grey,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: Colors.grey),
             ),
             Text(
-              expenseProvider.userProfile?.name ?? 'User',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              profile?.name ?? 'User',
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -106,18 +109,21 @@ class _HomeScreenState extends State<HomeScreen> {
           radius: 24,
           backgroundColor: Colors.blue.shade100,
           child: Text(
-            (expenseProvider.userProfile?.name ?? 'U').substring(0, 1),
+            (profile?.name ?? 'U').substring(0, 1),
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
+              fontWeight: FontWeight.bold,
+              color: Colors.blue,
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildTotalExpenseCard(double totalExpenses, ExpenseProvider provider) {
+  Widget _buildTotalExpenseCard(
+    double totalExpenses,
+    ExpenseProvider provider,
+  ) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -143,9 +149,9 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Text(
                 'Total Expenses',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.white70,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
               ),
               Container(
                 padding: const EdgeInsets.all(8),
@@ -165,9 +171,9 @@ class _HomeScreenState extends State<HomeScreen> {
           Text(
             '\$${totalExpenses.toStringAsFixed(2)}',
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 16),
           Row(
@@ -191,30 +197,34 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildLimitInfo(String label, double spent, double? limit) {
-    final limitText = limit != null ? ' / \$${limit.toStringAsFixed(2)}' : ' / No limit';
+    final limitText = limit != null
+        ? ' / \$${limit.toStringAsFixed(2)}'
+        : ' / No limit';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.white70,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: Colors.white70),
         ),
         const SizedBox(height: 4),
         Text(
           '\$${spent.toStringAsFixed(2)}$limitText',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-              ),
+            color: Colors.white,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ],
     );
   }
 
   Widget _buildPieChart(
-      Map<ExpenseCategory, double> expensesByCategory, BuildContext context) {
+    Map<ExpenseCategory, double> expensesByCategory,
+    BuildContext context,
+  ) {
     final filteredData = expensesByCategory.entries
         .where((e) => e.value > 0)
         .toList();
@@ -226,9 +236,9 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Text(
             'No expenses yet. Add your first expense!',
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
           ),
         ),
       );
@@ -251,27 +261,23 @@ class _HomeScreenState extends State<HomeScreen> {
           height: 250,
           child: PieChart(
             PieChartData(
-              sections: List.generate(
-                filteredData.length,
-                (index) {
-                  final amount = filteredData[index].value;
-                  final total =
-                      filteredData.fold(0.0, (sum, e) => sum + e.value);
-                  final percentage = (amount / total) * 100;
+              sections: List.generate(filteredData.length, (index) {
+                final amount = filteredData[index].value;
+                final total = filteredData.fold(0.0, (sum, e) => sum + e.value);
+                final percentage = (amount / total) * 100;
 
-                  return PieChartSectionData(
-                    color: colors[index % colors.length],
-                    value: amount,
-                    title: '${percentage.toStringAsFixed(1)}%',
-                    radius: 80,
-                    titleStyle: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  );
-                },
-              ),
+                return PieChartSectionData(
+                  color: colors[index % colors.length],
+                  value: amount,
+                  title: '${percentage.toStringAsFixed(1)}%',
+                  radius: 80,
+                  titleStyle: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                );
+              }),
               centerSpaceRadius: 0,
               sectionsSpace: 2,
             ),
@@ -281,46 +287,42 @@ class _HomeScreenState extends State<HomeScreen> {
         Wrap(
           spacing: 12,
           runSpacing: 12,
-          children: List.generate(
-            filteredData.length,
-            (index) {
-              final category = filteredData[index].key;
-              final amount = filteredData[index].value;
+          children: List.generate(filteredData.length, (index) {
+            final category = filteredData[index].key;
+            final amount = filteredData[index].value;
 
-              return Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 12,
-                    height: 12,
-                    decoration: BoxDecoration(
-                      color: colors[index % colors.length],
-                      borderRadius: BorderRadius.circular(3),
-                    ),
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: colors[index % colors.length],
+                    borderRadius: BorderRadius.circular(3),
                   ),
-                  const SizedBox(width: 8),
-                  Flexible(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${category.emoji} ${category.label}',
-                          style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${category.emoji} ${category.label}',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      Text(
+                        '\$${amount.toStringAsFixed(2)}',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
-                        Text(
-                          '\$${amount.toStringAsFixed(2)}',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              );
-            },
-          ),
+                ),
+              ],
+            );
+          }),
         ),
       ],
     );
@@ -335,9 +337,9 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.all(32.0),
           child: Text(
             'No expenses recorded',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
           ),
         ),
       );
@@ -379,15 +381,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         expense.title,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         DateFormat('MMM d, yyyy').format(expense.date),
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.grey,
-                            ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodySmall?.copyWith(color: Colors.grey),
                       ),
                     ],
                   ),
@@ -398,16 +400,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text(
                       '-\$${expense.amount.toStringAsFixed(2)}',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.red,
-                          ),
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       expense.category.label,
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: Colors.grey,
-                          ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.labelSmall?.copyWith(color: Colors.grey),
                     ),
                   ],
                 ),
@@ -443,8 +445,8 @@ class _HomeScreenState extends State<HomeScreen> {
               Text(
                 'Add New Expense',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 20),
               TextField(
